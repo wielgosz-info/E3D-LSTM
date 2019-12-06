@@ -3,7 +3,6 @@ import h5py
 import math
 import matplotlib.pyplot as plt
 import os
-import psutil
 import sys
 import torch
 import torch.nn.init as init
@@ -36,6 +35,7 @@ def mem_report():
 
 
 def cpu_stats():
+    import psutil
     print(sys.version)
     print(psutil.cpu_percent())
     print(psutil.virtual_memory())  # physical memory usage
@@ -110,10 +110,12 @@ def h5_virtual_file(filenames, name="data"):
         data = h5py.File(path, "r").get(name)
         t, *features_shape = data.shape
         total_t += t
-        vsources.append(h5py.VirtualSource(path, name, shape=(t, *features_shape)))
+        vsources.append(h5py.VirtualSource(
+            path, name, shape=(t, *features_shape)))
 
     # Assemble virtual dataset
-    layout = h5py.VirtualLayout(shape=(total_t, *features_shape), dtype=data.dtype)
+    layout = h5py.VirtualLayout(
+        shape=(total_t, *features_shape), dtype=data.dtype)
     cursor = 0
     for vsource in vsources:
         # we generate slices like layour[0:10,:,:,:]
